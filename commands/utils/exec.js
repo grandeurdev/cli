@@ -42,7 +42,12 @@ module.exports = function exec(args, debug) {
         })
 
         // Stdout logs if debug
-        debug ? child.stdout.on("data", data => console.log(data)) : null;
+        if (debug) {
+        
+            child.stdout.pipe(process.stdout)
+            child.stderr.pipe(process.stderr)
+
+        }
 
     });
 

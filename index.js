@@ -12,6 +12,7 @@ const commander = require("commander");
 
 // Include sub commands
 const init = require("./commands/init");
+const upload = require("./commands/upload");
 
 // Create a new program
 const program = new commander.Command();
@@ -26,7 +27,7 @@ program
 program
     .command("upload")
     .description("compile and upload sketch")
-    .action(init);
+    .action(upload);
 
 // Then run the handler
 program.parse(process.argv);
