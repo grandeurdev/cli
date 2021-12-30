@@ -29,10 +29,13 @@ const log = require("./log");
 module.exports = function() {
     // Return a new promise
     return new Promise( async (resolve, reject) => {
+        // Grandeur directory
+        const home = path.join(os.homedir(), ".grandeur");
+
         // Use try catch to handle errors
         try {
             // Validate that the arduino is installed
-            await fs.access(path.join(os.homedir(), "./.grandeur/tools/arduino-cli"));
+            await fs.access(path.join(home, "/tools/arduino-cli"));
 
             // Then resolve the promise
             resolve();
@@ -48,7 +51,7 @@ module.exports = function() {
 
                 // Arduino not found
                 // Create grandeur and tools folder
-                await fs.mkdir(path.join(os.homedir(), "./.grandeur/tools"), { recursive: true });
+                await fs.mkdir(path.join(home, "/tools"), { recursive: true });
 
                 // Formualate url
                 const url = "https://github.com/arduino/arduino-cli/releases/download/0.20.2/arduino-cli_0.20.2_macOS_64bit.tar.gz";
@@ -91,7 +94,61 @@ module.exports = function() {
                     log.success("Download completed.", "both");
 
                     // Then decompress downloaded content into dist directory
-                    await decompress(download.getContents(), path.join(os.homedir(), "./.grandeur/tools/"));
+                    await decompress(download.getContents(), path.join(home, "/tools/"));
+
+                    // Finally write the config file
+                    await fs.writeFile(path.join(home, "/tools/arduino-cli.json"), JSON.stringify({
+
+                        // Add additional board url
+                        board_manager: {
+                            additional_urls: ["https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json", "https://arduino.esp8266.com/stable/package_esp8266com_index.json"]
+                        },
+
+                        // To run the arduino into daemon mode
+                        daemon: {
+                            port: "50051"
+                        },
+
+                        // Directories to save arduino data
+                        directories: {
+                            data: home + "/data",
+                            downloads: home + "/staging",
+                            user: home + "/user",
+                        },
+
+                        // Settings related to library
+                        library: {
+                            enable_unsafe_install: false
+                        },
+
+                        // Logging settings
+                        logging: {
+                            file: "",
+                            format: "text",
+                            level: "info"
+                        },
+
+                        // Metrics config
+                        metrics: {
+                            addr: ":9090",
+                            enabled: true
+                        },
+
+                        // Output config
+                        output: {
+                            no_color: false
+                        },
+
+                        // Config for sketch
+                        sketch: {
+                            always_export_binaries: false
+                        },
+
+                        // Enable update notifications
+                        updater: {
+                            enable_notification: true
+                        }
+                    }, null, 4));
 
                     // Then resolve the promise
                     resolve();

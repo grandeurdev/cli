@@ -13,8 +13,17 @@ const figlet = require("figlet");
 // Library for logging
 const log = require("./utils/log");
 
+// To handle directory
+const fs = require("fs").promises;
+
+// To handle path
+const path = require("path");
+
 // Library to handle arduino installation
 const arduino = require("./utils/arduino");
+
+// Library to manage board
+const board = require("./utils/board");
 
 // Export a function, which will be passed to commander
 module.exports = async function() {
@@ -37,7 +46,7 @@ module.exports = async function() {
         }, {
 
             // Then ask for the architecture
-            message: "Please select an architecture",
+            message: "Please select the architecture",
             type: "list",
             choices: ["esp8266", "esp32"],
             name: "arch"
@@ -46,8 +55,51 @@ module.exports = async function() {
 
         // Validate that the arduino is installed
         await arduino();
+
+        // Validate that board is installed
+        await board(answers.arch === "esp8266" ? "esp8266:esp8266@3.0.2" : "esp32:esp32@2.0.2");
+
+        // Workspace folder url
+        const workspace = path.join(process.cwd(), answers.name);
+
+        // Then create the workspace folder in cwd
+        await fs.mkdir(workspace);
+
+        // Then create the sketch main file in it
+        await fs.writeFile(path.join(workspace, answers.name + ".ino"), `
+ 
+// the setup function runs once when you press reset or power the board
+void setup() {
+
+}
+
+// the loop function runs over and over again forever
+void loop() {
+
+}
+        `);
+
+        // Fin create the packages file
+        await fs.writeFile(path.join(workspace, "package.json"), JSON.stringify({
+            "name": answers.name,
+            "version": "1.0.0",
+            "description": "",
+            "main": `${answers.name}.ino`,
+            "author": "",
+            "license": "ISC",
+            "dependencies": {
+                
+            },
+            "arch": answers.arch
+        }, null, 4));
+
+        // Log message
+        log.success("Done!", "both");
     } 
     catch (error) {
+        // Handle case where sketch already exists
+        if (error.code === "EEXIST") log.info("Sketch with a similar name already exists in this folder");
+        
         // Throw the error
         log.error("Failed to create new sketch");
     }
