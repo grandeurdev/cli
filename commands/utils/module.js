@@ -1,4 +1,4 @@
-// To install package
+// To install module
 
 // Import libraries
 // For loader
@@ -70,7 +70,6 @@ module.exports = async function(name, debug) {
         return library
     } 
     catch (error) {
-        console.log(error);
         // Throw to parent
         throw error
     }

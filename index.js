@@ -22,5 +22,11 @@ program
     .description("create a new sketch")
     .action(init);
 
+// Add upload command to the program
+program
+    .command("upload")
+    .description("compile and upload sketch")
+    .action(init);
+
 // Then run the handler
 program.parse(process.argv);

@@ -25,8 +25,8 @@ const arduino = require("./utils/arduino");
 // Library to manage board
 const board = require("./utils/board");
 
-// Library to manage package
-const package = require("./utils/package");
+// To install Grandeur library
+const library = require("./utils/module");
 
 // Export a function, which will be passed to commander
 module.exports = async function() {
@@ -66,7 +66,7 @@ module.exports = async function() {
         await board(arch);
 
         // Install grandeur
-        var lib = await package("grandeur", false);
+        var lib = await library("grandeur", false);
 
         // Workspace folder url
         const workspace = path.join(process.cwd(), answers.name);
