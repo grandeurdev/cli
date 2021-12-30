@@ -52,10 +52,10 @@ module.exports = async function(name, debug) {
 
         // Otherwise install the library
         // Log message
-        log.info("Installing package", "both");
+        log.info(`Installing module ${name}`, "both");
 
         // And start loading if not in debug mode
-        if (!debug) var loading = ora("Downloading package").start();
+        if (!debug) var loading = ora("Downloading module").start();
 
         // We will use arduino to install grandeur
         await arduino([ "lib", "install", name ], debug);

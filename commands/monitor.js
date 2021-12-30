@@ -1,5 +1,4 @@
-// Upload command will compile the code
-// and upload it to board
+// Monitor command will attach to a serial
 
 // Import libraries
 // To build prompt
@@ -64,10 +63,7 @@ module.exports = async function() {
         await arduino(["monitor", "-p", port], true);
     } 
     catch (error) {
-        // Handle case where sketch already exists
-        if (error.code === "ENOENT") log.info("Invalid sketch directory.", "start");
-        
         // Throw the error
-        log.error("Failed to upload sketch", "end");
+        log.error("Failed to open serial port", "end");
     }
 }

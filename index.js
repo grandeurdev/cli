@@ -14,6 +14,7 @@ const commander = require("commander");
 const init = require("./commands/init");
 const upload = require("./commands/upload");
 const monitor = require("./commands/monitor");
+const install = require("./commands/install");
 
 // Create a new program
 const program = new commander.Command();
@@ -35,6 +36,12 @@ program
     .command("monitor")
     .description("attach to serial of a board")
     .action(monitor);
+
+// Add monitor command to the program
+program
+    .command("install [module]")
+    .description("install dependencies or module")
+    .action(install);
 
 // Then run the handler
 program.parse(process.argv);
