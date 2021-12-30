@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+'use strict';
 // Grandeur toolchain is designed to be 
 // make it easier for developers to get started
 // with IoT dev. It is lose coupling on Arduino
