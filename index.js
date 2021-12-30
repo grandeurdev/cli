@@ -13,6 +13,7 @@ const commander = require("commander");
 // Include sub commands
 const init = require("./commands/init");
 const upload = require("./commands/upload");
+const monitor = require("./commands/monitor");
 
 // Create a new program
 const program = new commander.Command();
@@ -28,6 +29,12 @@ program
     .command("upload")
     .description("compile and upload sketch")
     .action(upload);
+
+// Add monitor command to the program
+program
+    .command("monitor")
+    .description("attach to serial of a board")
+    .action(monitor);
 
 // Then run the handler
 program.parse(process.argv);
