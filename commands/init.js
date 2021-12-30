@@ -25,6 +25,9 @@ const arduino = require("./utils/arduino");
 // Library to manage board
 const board = require("./utils/board");
 
+// Library to manage package
+const package = require("./utils/package");
+
 // Export a function, which will be passed to commander
 module.exports = async function() {
     // In a try catch
@@ -56,8 +59,14 @@ module.exports = async function() {
         // Validate that the arduino is installed
         await arduino();
 
+        // Setup board name
+        const arch = answers.arch === "esp8266" ? "esp8266:esp8266@3.0.2" : "esp32:esp32@2.0.2";
+
         // Validate that board is installed
-        await board(answers.arch === "esp8266" ? "esp8266:esp8266@3.0.2" : "esp32:esp32@2.0.2");
+        await board(arch);
+
+        // Install grandeur
+        var lib = await package("grandeur", false);
 
         // Workspace folder url
         const workspace = path.join(process.cwd(), answers.name);
@@ -81,16 +90,25 @@ void loop() {
 
         // Fin create the packages file
         await fs.writeFile(path.join(workspace, "package.json"), JSON.stringify({
+
+            // Standard stuff
             "name": answers.name,
             "version": "1.0.0",
             "description": "",
             "main": `${answers.name}.ino`,
             "author": "",
             "license": "ISC",
+
+            // Dependencies
             "dependencies": {
-                
+
+                // Grandeur is core dependency
+                [lib.name]: "@" + lib.version
             },
-            "arch": answers.arch
+
+            // Architecture of board
+            "arch": arch
+
         }, null, 4));
 
         // Log message
@@ -98,9 +116,9 @@ void loop() {
     } 
     catch (error) {
         // Handle case where sketch already exists
-        if (error.code === "EEXIST") log.info("Sketch with a similar name already exists in this folder");
+        if (error.code === "EEXIST") log.info("Sketch with a similar name already exists in this folder", "start");
         
         // Throw the error
-        log.error("Failed to create new sketch");
+        log.error("Failed to create new sketch", "end");
     }
 }
