@@ -17,6 +17,9 @@ const fs = require("fs").promises;
 // To handle path
 const path = require("path");
 
+// Library to get boards
+const boards = require("./utils/ports");
+
 // Import exec to run arduino commands
 const arduino = require("./utils/exec");
 
@@ -33,87 +36,87 @@ module.exports = async function() {
         // Get arch name
         const arch = sketch.arch.split("@")[0];
 
-        // List all connected boards
-        var boards = await arduino(["board", "list"]);
+        // Get ports and addresses labels
+        const { ports, addresses, keywords, suggestions } = await boards();
 
-        // Convert to json
-        boards = JSON.parse(boards);
-
-        // Formulate arrays for ports and board names
-        var ports = [];
-
-        // Filter ports and remove non usb serial ports
-        for (var board of boards) {
-            // Continue if it is not a valid port
-            if (board.port.protocol_label !== "Serial Port (USB)") continue;
-
-            // Push port and label to respective array
-            ports.push(board.port.address);
-        }
-
-        // If a board is not connected than throw an error
-        if (ports.length === 0) {
-
-            // Display message
-            log.info("Connect a board to continue");
-
-            // And exit
-            throw {};
-        }
-
-        // Get cores
-        var cores = await arduino(["core", "list"]);
-
-        // Parse cores
-        cores = JSON.parse(cores);
-
-        // Object to store targets
-        var targets;
-        var labels = []
-
-        // Loop over cores to get targets
-        for (var core of cores) {
-            // Match id
-            if (core.id === arch) {
-
-                // Set targets
-                targets = core.boards;
-
-                // Then loop over core to filter data
-                for (var target of core.boards) {
-                    // Push names to lables
-                    labels.push(target.name);
-                }
-
-                // Break loop
-                break;
-            }
-        }
-
-        // Then display the list
-        const answers = await inquirer.prompt([{
+        // Ask for port selection from user
+        var { port } = await inquirer.prompt([{
 
             // Ask for the port
             message: "Please select your board",
             type: "list",
-            choices: ports,
+            choices: addresses,
             name: "port"
-            
-        }, {
 
-            // Then ask for the target
-            message: "Specify the board name of selected port",
-            type: "search",
-            choices: labels,
-            name: "target"
-            
         }]);
-        
-        // Get port
-        const port = answers.port;
 
-        // Replace board target label with fqbn
-        const { fqbn } = targets.find( (target) => target.name === answers.target );
+        // Check if the selection is from the suggested key
+        if (keywords.includes(port)) {
+
+            // Then get the port address and fbqn from options
+            var { address, fqbn } = ports[addresses.indexOf(port)];
+
+            // Then replace the suggestion with address and extract fbqn
+            port = address;
+
+        }
+        else {
+
+            // Get board selection from user
+            // Get cores
+            var cores = await arduino(["core", "list"]);
+
+            // Parse cores
+            cores = JSON.parse(cores);
+
+            // Object to store targets
+            var targets;
+            var labels = [];
+
+            // Loop over cores to get targets
+            for (var core of cores) {
+                // Match id
+                if (core.id === arch) {
+
+                    // Set targets
+                    targets = core.boards;
+
+                    // Then loop over core to filter data
+                    for (var target of core.boards) {
+                        // Push names to lables
+                        labels.push(target.name);
+                    }
+
+                    // Break loop
+                    break;
+                }
+            }
+
+            // Then display the list
+            var { target } = await inquirer.prompt([{
+
+                // Then ask for the target
+                message: "Specify the board name of selected port",
+                type: "search",
+                choices: labels,
+                name: "target"
+                
+            }]);
+
+            // Get vid pid pair based on port address
+            const { properties } = ports[addresses.indexOf(port)];
+
+            // Replace board target label with fqbn
+            var { fqbn } = targets[labels.indexOf(target)];
+
+            // Take the properties and fqbn and add to suggestions
+            // Write back
+            await suggestions(properties.pid + properties.vid, {
+                fqbn: fqbn,
+                name: target
+            });
+
+        }
 
         // Dipslay message
         log.info("Compilation started", "both");
