@@ -5,9 +5,6 @@
 // To build prompt
 const inquirer = require('inquirer');
 
-// Attach search list to inquirer
-inquirer.registerPrompt("search", require("inquirer-search-list"));
-
 // Library for logging
 const log = require("./log");
 
@@ -132,8 +129,37 @@ module.exports = async function() {
             ports = suggested.concat(new inquirer.Separator(), ports);
         }
 
+        // Ask for port selection from user
+        var { port } = await inquirer.prompt([{
+
+            // Ask for the port
+            message: "Please select your board",
+            type: "list",
+            choices: addresses,
+            name: "port"
+
+        }]);
+
+        // Check if the selection is from the suggested key
+        if (filtered.includes(port)) {
+
+            // Then get the port address and fbqn from options
+            var { address, fqbn } = ports[addresses.indexOf(port)];
+
+            // Then replace the suggestion with address and extract fbqn
+            port = address;
+
+        }
+        else {
+
+            // Otherwise also return the properties of board
+            // Get vid pid pair based on port address
+            var { properties } = ports[addresses.indexOf(port)];
+
+        }
+
         // Resolve promise and return address and ports
-        return { addresses, ports, keywords: filtered, suggestions };
+        return { port, fqbn, properties, suggestions };
     } 
     catch (error) {
         // Pass error

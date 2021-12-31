@@ -18,7 +18,7 @@ const fs = require("fs").promises;
 const path = require("path");
 
 // Library to get boards
-const boards = require("./utils/ports");
+const boards = require("./utils/boards");
 
 // Import exec to run arduino commands
 const arduino = require("./utils/exec");
@@ -37,30 +37,10 @@ module.exports = async function() {
         const arch = sketch.arch.split("@")[0];
 
         // Get ports and addresses labels
-        const { ports, addresses, keywords, suggestions } = await boards();
+        var { port, fqbn, properties, suggestions } = await boards();
 
-        // Ask for port selection from user
-        var { port } = await inquirer.prompt([{
-
-            // Ask for the port
-            message: "Please select your board",
-            type: "list",
-            choices: addresses,
-            name: "port"
-
-        }]);
-
-        // Check if the selection is from the suggested key
-        if (keywords.includes(port)) {
-
-            // Then get the port address and fbqn from options
-            var { address, fqbn } = ports[addresses.indexOf(port)];
-
-            // Then replace the suggestion with address and extract fbqn
-            port = address;
-
-        }
-        else {
+        // If we don't know about the target of selected port
+        if (!fqbn) {
 
             // Get board selection from user
             // Get cores
@@ -103,14 +83,10 @@ module.exports = async function() {
                 
             }]);
 
-            // Get vid pid pair based on port address
-            const { properties } = ports[addresses.indexOf(port)];
-
-            // Replace board target label with fqbn
-            var { fqbn } = targets[labels.indexOf(target)];
+            // Get fqbn of the selected target
+            fqbn = targets[labels.indexOf(target)].fqbn;
 
             // Take the properties and fqbn and add to suggestions
-            // Write back
             await suggestions(properties.pid + properties.vid, {
                 fqbn: fqbn,
                 name: target
@@ -134,6 +110,7 @@ module.exports = async function() {
         await arduino(["monitor", "-p", port], true);
     } 
     catch (error) {
+        console.log(error)
         // Handle case where sketch already exists
         if (error.code === "ENOENT") log.info("Invalid sketch directory.", "start");
         
