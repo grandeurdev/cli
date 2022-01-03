@@ -14,7 +14,7 @@ const commander = require("commander");
 
 // Include sub commands
 const init = require("./commands/init");
-const upload = require("./commands/upload");
+const run = require("./commands/run");
 const monitor = require("./commands/monitor");
 const install = require("./commands/install");
 
@@ -27,11 +27,11 @@ program
     .description("create a new sketch")
     .action(init);
 
-// Add upload command to the program
+// Add run command to the program
 program
-    .command("upload")
+    .command("run")
     .description("compile and upload sketch")
-    .action(upload);
+    .action(run);
 
 // Add monitor command to the program
 program
