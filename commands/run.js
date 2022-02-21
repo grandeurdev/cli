@@ -110,7 +110,6 @@ module.exports = async function() {
         await arduino(["monitor", "-p", port], true);
     } 
     catch (error) {
-        console.log(error)
         // Handle case where sketch already exists
         if (error.code === "ENOENT") log.info("Invalid sketch directory.", "start");
         
