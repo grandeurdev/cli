@@ -24,7 +24,8 @@ const boards = require("./utils/boards");
 const arduino = require("./utils/exec");
 
 // Export a function, which will be passed to commander
-module.exports = async function() {
+module.exports = async function(options) {
+
     // In a try catch
     try {
         // Open the package file
@@ -112,6 +113,9 @@ module.exports = async function() {
     catch (error) {
         // Handle case where sketch already exists
         if (error.code === "ENOENT") log.info("Invalid sketch directory.", "start");
+
+        // Push error logs to console if debug mode is activated
+        options.debug ? log.raw(error) : null;
         
         // Throw the error
         log.error("Failed to upload sketch", "end");

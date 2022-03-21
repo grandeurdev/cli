@@ -11,7 +11,7 @@ const log = require("./log");
 const arduino = require("./exec");
 
 // Export a function, which will be passed to commander
-module.exports = async function(board) {
+module.exports = async function(board, debug) {
 
     // In a try catch
     try {
@@ -41,7 +41,7 @@ module.exports = async function(board) {
 
         // Board is not installed
         // Install the board
-        await arduino([ "core", "install", board ]);
+        await arduino([ "core", "install", board ], debug);
 
         // Then end loading
         loading.succeed("Download completed.");

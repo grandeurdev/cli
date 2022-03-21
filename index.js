@@ -25,18 +25,21 @@ const program = new commander.Command();
 program
     .command("init")
     .description("create a new sketch")
+    .option("-d, --debug")
     .action(init);
 
 // Add run command to the program
 program
     .command("run")
     .description("compile and upload sketch")
+    .option("-d, --debug")
     .action(run);
 
 // Add monitor command to the program
 program
     .command("monitor")
     .description("attach to serial of a board")
+    .option("-d, --debug")
     .action(monitor);
 
 // Add monitor command to the program

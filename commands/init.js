@@ -29,7 +29,7 @@ const board = require("./utils/board");
 const library = require("./utils/module");
 
 // Export a function, which will be passed to commander
-module.exports = async function() {
+module.exports = async function(options) {
     // In a try catch
     try {
         // Generate logo
@@ -63,10 +63,10 @@ module.exports = async function() {
         const arch = answers.arch === "esp8266" ? "esp8266:esp8266@3.0.2" : "esp32:esp32@2.0.2";
 
         // Validate that board is installed
-        await board(arch);
+        await board(arch, options.debug);
 
         // Install grandeur
-        var lib = await library("grandeur", false);
+        var lib = await library("grandeur", options.debug);
 
         // Workspace folder url
         const workspace = path.join(process.cwd(), answers.name);
@@ -117,6 +117,9 @@ void loop() {
     catch (error) {
         // Handle case where sketch already exists
         if (error.code === "EEXIST") log.info("Sketch with a similar name already exists in this folder", "start");
+
+        // Push error logs to console if debug mode is activated
+        options.debug ? log.raw(error) : null;
         
         // Throw the error
         log.error("Failed to create new sketch", "end");

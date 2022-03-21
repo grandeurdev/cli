@@ -15,7 +15,7 @@ const path = require("path");
 const library = require("./utils/module");
 
 // Export a function, which will be passed to commander
-module.exports = async function(name) {
+module.exports = async function(name, options) {
     // In a try catch
     try {
         // Open the package file
@@ -58,6 +58,9 @@ module.exports = async function(name) {
     catch (error) {
         // Handle case where sketch already exists
         if (error.code === "ENOENT") log.info("Invalid sketch directory.", "start");
+
+        // Push error logs to console if debug mode is activated
+        options.debug ? log.raw(error) : null;
         
         // Throw the error
         log.error("Failed to install library", "end");
