@@ -12,7 +12,8 @@
       "node_modules/figlet/fonts/Slant.flf"
     ],
     "targets": [
-      "node14-macos-arm64"
+      "node14-macos-arm64",
+      "node14-win-x64"
     ],
     "outputPath": "dist"
   },

@@ -32,10 +32,22 @@ module.exports = function() {
         // Grandeur directory
         const home = path.join(os.homedir(), ".grandeur");
 
+        // Get platform name
+        const platform = os.platform();
+
+        // Validate platform name
+        if (!["darwin", "win32"].includes(platform)) {
+            // Throw invalid platform error
+            log.error("Invalid platform!", "both");
+
+            // and throw
+            return reject({ code: "INVALID-PLATFORM" }); 
+        }
+
         // Use try catch to handle errors
         try {
             // Validate that the arduino is installed
-            await fs.access(path.join(home, "/tools/arduino-cli"));
+            await fs.access(path.join(home, `/tools/arduino-cli${platform === "win32" ? ".exe" : null}`));
 
             // Then resolve the promise
             resolve();
@@ -54,7 +66,7 @@ module.exports = function() {
                 await fs.mkdir(path.join(home, "/tools"), { recursive: true });
 
                 // Formualate url
-                const url = "https://github.com/arduino/arduino-cli/releases/download/0.20.2/arduino-cli_0.20.2_macOS_64bit.tar.gz";
+                const url = `https://github.com/arduino/arduino-cli/releases/download/0.20.2/arduino-cli_0.20.2_${ platform === "win32" ? "Windows_64bit.zip" : "macOS_64bit.tar.gz"}`;
 
                 // Create download stream
                 const download = new streamBuffers.WritableStreamBuffer({
@@ -157,7 +169,7 @@ module.exports = function() {
             catch (err) {
                 // If it is an axios error
                 // Then display download failed message
-                if (err.isAxiosError) log.error("Downlaod failed!");
+                if (err.isAxiosError) log.error("Download failed!");
 
                 // and reject anyway
                 reject(err);

@@ -37,14 +37,14 @@ module.exports = async function(board, debug) {
         log.info("Board dependency not found!", "both");
 
         // Start installing
-        const loading = ora("Downloading board. This may take a while").start();
+        const loading = !debug ? ora("Downloading board. This may take a while").start() : null;
 
         // Board is not installed
         // Install the board
         await arduino([ "core", "install", board ], debug);
 
         // Then end loading
-        loading.succeed("Download completed.");
+        !debug ? loading.succeed("Download completed.") : log.success("Download completed.");
     } 
     catch (error) {
         // Throw to parent
