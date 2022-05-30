@@ -23,6 +23,9 @@ const boards = require("./utils/boards");
 // Import exec to run arduino commands
 const arduino = require("./utils/exec");
 
+// Check script
+const checks = require("./utils/checks");
+
 // Export a function, which will be passed to commander
 module.exports = async function(options) {
 
@@ -36,6 +39,9 @@ module.exports = async function(options) {
 
         // Get arch name
         const arch = sketch.arch.split("@")[0];
+
+        // Run neccessary tests
+        await checks(sketch.arch, options.debug);
 
         // Get ports and addresses labels
         var { port, fqbn, properties, suggestions } = await boards();

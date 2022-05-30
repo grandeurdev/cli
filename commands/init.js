@@ -19,14 +19,8 @@ const fs = require("fs").promises;
 // To handle path
 const path = require("path");
 
-// Library to handle arduino installation
-const arduino = require("./utils/arduino");
-
-// Library to manage board
-const board = require("./utils/board");
-
-// To install Grandeur library
-const library = require("./utils/module");
+// Library to handle installations
+const checks = require("./utils/checks");
 
 // Export a function, which will be passed to commander
 module.exports = async function(options) {
@@ -56,17 +50,11 @@ module.exports = async function(options) {
             
         }]);
 
-        // Validate that the arduino is installed
-        await arduino();
-
         // Setup board name
         const arch = answers.arch === "esp8266" ? "esp8266:esp8266@3.0.2" : "esp32:esp32@2.0.2";
 
-        // Validate that board is installed
-        await board(arch, options.debug);
-
-        // Install grandeur
-        var lib = await library("grandeur", options.debug);
+        // Perform checks
+        var lib = await checks(arch, options.debug);
 
         // Workspace folder url
         const workspace = path.join(process.cwd(), answers.name);

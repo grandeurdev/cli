@@ -47,7 +47,7 @@ module.exports = function() {
         // Use try catch to handle errors
         try {
             // Validate that the arduino is installed
-            await fs.access(path.join(home, `/tools/arduino-cli${platform === "win32" ? ".exe" : null}`));
+            await fs.access(path.join(home, `/tools/arduino-cli${platform === "win32" ? ".exe" : ""}`));
 
             // Then resolve the promise
             resolve();
