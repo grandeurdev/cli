@@ -59,14 +59,14 @@ module.exports = function() {
             // Use another try catch to handle errors
             try {
                 // Log message
-                log.info("Compiler dependency not found!", "both");
+                log.info("Downloading Arduino", "both");
 
                 // Arduino not found
                 // Create grandeur and tools folder
                 await fs.mkdir(path.join(home, "/tools"), { recursive: true });
 
                 // Formualate url
-                const url = `https://github.com/arduino/arduino-cli/releases/download/0.20.2/arduino-cli_0.20.2_${ platform === "win32" ? "Windows_64bit.zip" : "macOS_64bit.tar.gz"}`;
+                const url = `https://github.com/arduino/arduino-cli/releases/download/0.26.0/arduino-cli_0.26.0_${ platform === "win32" ? "Windows_64bit.zip" : "macOS_64bit.tar.gz"}`;
 
                 // Create download stream
                 const download = new streamBuffers.WritableStreamBuffer({

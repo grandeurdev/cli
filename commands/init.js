@@ -51,7 +51,7 @@ module.exports = async function(options) {
         }]);
 
         // Setup board name
-        const arch = answers.arch === "esp8266" ? "esp8266:esp8266@3.0.2" : "esp32:esp32@2.0.2";
+        const arch = answers.arch === "esp8266" ? "esp8266:esp8266@3.0.2" : "esp32:esp32@2.0.4";
 
         // Perform checks
         var lib = await checks(arch, options.debug);
