@@ -46,6 +46,7 @@ program
 program
     .command("install [module]")
     .description("install dependencies or module")
+    .option("-d, --debug")
     .action(install);
 
 // Then run the handler

@@ -4,6 +4,9 @@
 // For loader
 const ora = require("ora");
 
+// To build prompt
+const inquirer = require('inquirer');
+
 // Library for logging
 const log = require("./log");
 
@@ -14,7 +17,7 @@ const arduino = require("./exec");
 async function version(library) {
 
     // Get the library details
-    var libs = await arduino([ "lib", "list", library ]);
+    var libs = await arduino([ "lib", "list" ]);
 
     // Convert to json
     libs = JSON.parse(libs);
@@ -40,12 +43,38 @@ async function version(library) {
 }
 
 // Export a function, which will be passed to commander
-module.exports = async function(name, debug) {
+module.exports = async function(name, debug, search) {
 
     // In a try catch
     try {
-        // First make sure that the library is not already installed
-        var library = await version(name.split("@")[0]);
+        // If search is required
+        if (search) {
+
+            // Then we are gonna give user a way to select right lib
+            // We want to help user find right library
+            var libs = await arduino([ "lib", "search", name ]);
+
+            // Covert to json
+            libs = JSON.parse(libs).libraries;
+
+            // Create list of suggested library names
+            var names = libs.map( lib => lib.name );
+
+            // Ask for selection from user
+            var { name } = await inquirer.prompt([{
+
+                // Ask for the port
+                message: "Select the module to install",
+                type: "search",
+                choices: names,
+                name: "name"
+
+            }]);
+            
+        }
+
+        // Then make sure that the library is not already installed
+        var library = await version(name);
 
         // If a library version was returned then resolve
         if (library) return library;
@@ -64,7 +93,7 @@ module.exports = async function(name, debug) {
         if (!debug) loading.succeed("Download completed.");
 
         // Get library version
-        var library = await version(name.split("@")[0]);
+        var library = await version(name);
 
         // and resolve
         return library

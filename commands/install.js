@@ -29,7 +29,7 @@ module.exports = async function(name, options) {
 
             // Take the library name and install
             // Always install latest
-            const lib = await library(name.split("@")[0], true);
+            const lib = await library(name.split("@")[0], true, true);
 
             // Take lib name and update packages
             sketch.dependencies[lib.name] = "@" + lib.version;
