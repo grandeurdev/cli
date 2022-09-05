@@ -34,10 +34,10 @@ module.exports = async function(board, debug) {
         }
         
         // Log message
-        log.info("Board dependency not found!", "both");
+        log.info("Downloading board", "both");
 
         // Start installing
-        const loading = !debug ? ora("Downloading board. This may take a while").start() : null;
+        const loading = !debug ? ora("This may take a while").start() : null;
 
         // Board is not installed
         // Install the board
